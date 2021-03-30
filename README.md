@@ -1,18 +1,19 @@
 # Deployment an inference endpoints using a custom spark 3.0.1 image
 
-## Requirements:
-  * Create an [Azure Machine Learning workspace](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace?tabs=python)
-  * Install [azureml-sdk](https://pypi.org/project/azureml-sdk/)
+## Requirements
+
+* Create an [Azure Machine Learning workspace](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-manage-workspace?tabs=python)
+* Install [azureml-sdk](https://pypi.org/project/azureml-sdk/)
 
 You can use this tutorial with Jupyter notebooks (from Azure ML) as well as Azure Databricks notebooks.
 
 ## Register an inference spark environment
+
 We will use a custom Dockerfile from [mmlspark](https://github.com/Azure/mmlspark/blob/master/tools/docker/minimal/Dockerfile).
 
 ### Get the Azure ML Workspace
-In this case we create a `get_workspace()` method that uses **azureml-sdk** and a [`Service Principal Authentication`](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-setup-authentication) to ensure we will be able to connect to the Azure ML Workspace in a security way we will also use an [Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/overview) to store our keys.
 
-(please see this [doc](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-setup-authentication) to check the different auth methods).
+In this case we create a `get_workspace()` method that uses **azureml-sdk** and a [`Service Principal Authentication`](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-setup-authentication). To ensure we will be able to connect to the Azure ML Workspace in a security way we will also use a [Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/overview) to store our keys. Please see this [doc](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-setup-authentication) to check the different auth methods.
 
 ```python
 import azureml
@@ -41,6 +42,7 @@ workspace = get_workspace(workspace_name, resource_group, subscription_id)
 ```
 
 ### Create the environment
+
 With Azure ML we can register an [environment](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-use-environments#:~:text=By%20default%2C%20Azure%20ML%20will%20build%20a%20Conda,libraries%20that%20you%20installed%20on%20the%20base%20image.) to track and reproduce our projects' software dependencies as they evolve.
 
 ```python
@@ -89,12 +91,14 @@ my_spark_env.inferencing_stack_version='latest'
 ```
 
 ### Register the environment
+
 Now we have created the environment with all dependencies we need we can simply register it to be able to use when necessary.
 
 `my_spark_env.register(workspace)`
 
 ## Deploy from an environment
-TO get this environment we can use `Environment.get` from azureml-sdk as well, so we can get the freezed environment to reuse it when it's being defined the **Inference Config** in the deployment process.
+
+To get this environment we can use `Environment.get` from azureml-sdk as well, so we can get the freezed environment to reuse it when it's being defined the **Inference Config** in the deployment process.
 
 ```python
 from azureml.core.environment import Environment
@@ -106,6 +110,7 @@ inference_config = InferenceConfig(entry_script="<YOUR-ENTRY-SCRIPT>", environme
 ```
 
 ## Finally deploy the model
+
 Here we will use ACI (Azure Container Instances) to deploy our model, but feel free to use the environment to an AKS deployment as well.
 
 ```python
@@ -120,7 +125,7 @@ service = Model.deploy(name=service_name, deployment_config=aci_config, models=[
 service.wait_for_deployment(show_output=True)
 ```
 
-Here the notebooks with the full example, try with your own spark model:
+Here the notebooks with the full example. Please feel free to try with your own spark model:
 
 * [Register an inference spark environment](./notebooks/register-spark-environment.ipynb)
 * [Deploy a spark model from an environment](./notebooks/deploy-from-environment.ipynb)
