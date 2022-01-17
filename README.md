@@ -1,4 +1,4 @@
-# Deployment an inference endpoints using a custom spark 3.0.1 image
+# Deployment inference endpoints using a custom spark 3.2.0 image
 
 ## Requirements
 
@@ -9,7 +9,7 @@ You can use this tutorial with Jupyter notebooks (from Azure ML) as well as Azur
 
 ## Register an inference spark environment
 
-We will use a custom Dockerfile from [mmlspark](https://github.com/Azure/mmlspark/blob/master/tools/docker/minimal/Dockerfile).
+We will use a custom Dockerfile combining the Prebuilt Azure ML environment [Minimal-Ubuntu-18](https://hub.docker.com/_/microsoft-azureml-inference) with Spark 3.2 image from [SynapseML](https://github.com/microsoft/SynapseML/blob/master/tools/docker/minimal/Dockerfile).
 
 ### Get the Azure ML Workspace
 
@@ -53,22 +53,27 @@ from azureml.core.model import InferenceConfig, Model
 
 # BASE IMAGE from https://github.com/Azure/mmlspark/blob/master/tools/docker/minimal/Dockerfile 
 dockerfile = """
-FROM ubuntu:16.04
+FROM mcr.microsoft.com/azureml/minimal-ubuntu18.04-py37-cpu-inference:latest
 
-ARG SPARK_VERSION=3.0.1
-RUN apt-get -qq update && apt-get -qq -y install curl bzip2 \
-    && curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh \
-    && bash /tmp/miniconda.sh -bfp /usr/local \
-    && rm -rf /tmp/miniconda.sh \
-    && conda install -y python=3 \
-    && conda update conda \
-    && apt-get install default-jre -y \
-    && conda install -c conda-forge pyspark=${SPARK_VERSION} \
-    && apt-get -qq -y remove curl bzip2 \
-    && apt-get -qq -y autoremove \
-    && apt-get autoclean \
-    && rm -rf /var/lib/apt/lists/* /var/log/dpkg.log \
-    && conda clean --all --yes
+USER root:root
+
+ARG SPARK_VERSION=3.2.0
+RUN mkdir -p /usr/share/man/man1 && \
+    apt-get -qq update && apt-get \
+    -qq upgrade && apt-get -qq -y install curl bzip2 && \
+    curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh && \
+    bash /tmp/miniconda.sh -bfp /usr/local && rm -rf /tmp/miniconda.sh && \
+    conda install -y python=3 && \
+    conda update conda && \
+    apt-get install openjdk-8-jre -y && \
+    conda install -c conda-forge pyspark=${SPARK_VERSION} && \
+    apt-get -qq -y remove curl bzip2 && \
+    apt-get -qq -y autoremove && \
+    apt-get autoclean && \
+    rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
+    conda clean --all --yes
+
+RUN pip install mlflow pyspark pandas azureml-defaults
 
 ENV PATH /opt/conda/bin:$PATH
 ENV JAVA_HOME /usr/lib/jvm/java-1.8.0-openjdk-amd64
@@ -76,11 +81,6 @@ ENV JAVA_HOME /usr/lib/jvm/java-1.8.0-openjdk-amd64
 
 # Create an environment to be able to customize our dependencies
 my_spark_env = Environment('spark-env-custom')
-
-# Add custom libs from PyPi
-my_spark_env.python.conda_dependencies.add_pip_package("azureml-defaults")
-my_spark_env.python.conda_dependencies.add_pip_package("mlflow")
-my_spark_env.python.conda_dependencies.add_pip_package("pyspark")
 
 # Now we can indicate we will use our custom Base Image
 my_spark_env.docker.base_image = None
@@ -127,5 +127,6 @@ service.wait_for_deployment(show_output=True)
 
 Here the notebooks with the full example. Please feel free to try with your own spark model:
 
+* [Train a native spark model](./notebooks/train-spark-classification-model.ipynb)
 * [Register an inference spark environment](./notebooks/register-spark-environment.ipynb)
 * [Deploy a spark model from an environment](./notebooks/deploy-from-environment.ipynb)
