@@ -13,7 +13,7 @@ We will use a custom Dockerfile combining the Prebuilt Azure ML environment [Min
 
 ### Get the Azure ML Workspace
 
-In this case we create a `get_workspace()` method that uses **azureml-sdk** and a [`Service Principal Authentication`](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-setup-authentication). To ensure we will be able to connect to the Azure ML Workspace in a security way we will also use a [Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/overview) to store our keys. Please see this [doc](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-setup-authentication) to check the different auth methods.
+In this case we create a `get_workspace()` method that uses **azureml-sdk** and a [`Service Principal Authentication`](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-setup-authentication). To ensure we will connect to the Azure ML Workspace in a secure way, we will also use a [Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/overview) to store our keys. Please see this [doc](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-setup-authentication) to check the different auth methods.
 
 ```python
 import azureml
@@ -43,7 +43,7 @@ workspace = get_workspace(workspace_name, resource_group, subscription_id)
 
 ### Create the environment
 
-With Azure ML we can register an [environment](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-use-environments#:~:text=By%20default%2C%20Azure%20ML%20will%20build%20a%20Conda,libraries%20that%20you%20installed%20on%20the%20base%20image.) to track and reproduce our projects' software dependencies as they evolve.
+With Azure ML we can register a [environment](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-use-environments#:~:text=By%20default%2C%20Azure%20ML%20will%20build%20a%20Conda,libraries%20that%20you%20installed%20on%20the%20base%20image.) to track and reproduce our projects' software dependencies as they evolve.
 
 ```python
 from azureml.core.environment import Environment
@@ -92,13 +92,13 @@ my_spark_env.inferencing_stack_version='latest'
 
 ### Register the environment
 
-Now we have created the environment with all dependencies we need we can simply register it to be able to use when necessary.
+Now that we have created the environment with all dependencies we need, we can simply register it to be able to use it when necessary.
 
 `my_spark_env.register(workspace)`
 
 ## Deploy from an environment
 
-To get this environment we can use `Environment.get` from azureml-sdk as well, so we can get the freezed environment to reuse it when it's being defined the **Inference Config** in the deployment process.
+To get this environment we can use `Environment.get` from azureml-sdk as well, so we can get the frozen environment to reuse it when it's being defined the **Inference Config** in the deployment process.
 
 ```python
 from azureml.core.environment import Environment
