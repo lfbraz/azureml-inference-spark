@@ -1,4 +1,4 @@
-# Deployment inference endpoints using a custom spark 3.2.0 image
+# Deploy inference endpoints using a custom spark 3.2.0 image
 
 ## Requirements
 
