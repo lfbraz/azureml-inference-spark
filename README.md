@@ -85,6 +85,7 @@ my_spark_env = Environment('spark-env-custom')
 # Now we can indicate we will use our custom Base Image
 my_spark_env.docker.base_image = None
 my_spark_env.docker.base_dockerfile = dockerfile
+my_spark_env.python.user_managed_dependencies = True
 
 # It's very important to use this parameter
 my_spark_env.inferencing_stack_version='latest'
