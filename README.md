@@ -126,6 +126,25 @@ service = Model.deploy(name=service_name, deployment_config=aci_config, models=[
 service.wait_for_deployment(show_output=True)
 ```
 
+If you want to test this model you can use this sample payload:
+
+```
+data = [{
+      "Idade": 48,
+      "RendaMensal": 9703,
+      "PercentualUtilizacaoLimite": 1,
+      "QtdTransacoesNegadas": 5,
+      "AnosDeRelacionamentoBanco": 12,
+      "JaUsouChequeEspecial": 0,
+      "QtdEmprestimos": 1,
+      "NumeroAtendimentos": 1,
+      "TMA": 300,
+      "IndiceSatisfacao": 5,
+      "Saldo": 6438,
+      "CLTV": 71 
+}]
+```
+
 Here the notebooks with the full example. Please feel free to try with your own spark model:
 
 * [Train a native spark model](./notebooks/train-spark-classification-model.ipynb)
